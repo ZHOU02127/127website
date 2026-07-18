@@ -8,6 +8,7 @@
 .editor-day{border:1px solid var(--line);border-radius:16px;padding:12px;background:#faf8fd}.editor-day h3{font-size:14px;text-align:center;margin:0 0 10px}
 .editor-slot{display:block;width:100%;border:1px solid #ddd3e9;background:#fff;border-radius:9px;padding:8px 3px;margin:6px 0;font:700 11px "DM Sans","Noto Sans SC",sans-serif;color:var(--muted);cursor:pointer}
 .editor-slot.open{background:var(--purple);color:#fff;border-color:var(--purple)}
-@media print{body>*:not(#success-dialog){display:none!important}#success-dialog{display:block!important;position:static;width:100%;max-width:none;box-shadow:none}.dialog-close,.dialog-actions,.dialog-inner>p{display:none!important}.dialog-inner{padding:20px}.dialog-inner pre{font-size:16px;border:1px solid #ccc;background:#fff}}
+/* 浏览器菜单直接打印时保留网页正文；预约摘要按钮使用独立打印窗口。 */
+@media print{.noise,.nav-wrap,.hero-actions,.toolbar-actions,.dialog-actions,.dialog-close{display:none!important}body{background:#fff}.section{break-inside:avoid}dialog:not([open]){display:none!important}}
 @media(max-width:900px){.skill-grid.feature-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.skill-grid.feature-grid{grid-template-columns:1fr}.calendar-toolbar{align-items:flex-start}.toolbar-actions{flex-direction:column;align-items:flex-end}.manage-btn{font-size:10px;padding:8px}.availability-editor{grid-template-columns:1fr 1fr}.dialog-actions{grid-template-columns:1fr}}
