@@ -26,6 +26,52 @@ const form=document.querySelector("#booking-form"),dialog=document.querySelector
 form.addEventListener("submit",e=>{e.preventDefault();if(!slotInput.value){selectedSlot.textContent="请先选择一个可预约时段";selectedSlot.style.color="#c43d67";document.querySelector(".calendar-area").scrollIntoView({behavior:"smooth",block:"center"});return}const data=new FormData(form);const text=`课程预约申请\n\n称呼：${data.get("name")}\n课程：${data.get("course")}\n辅导类型：${data.get("type")}\n预约时间：${data.get("slot")}\n需求备注：${data.get("note")||"暂无"}`;summary.textContent=text;localStorage.setItem("latestBooking",text);dialog.showModal()});
 document.querySelector(".dialog-close").addEventListener("click",()=>dialog.close());
 document.querySelector("#copy-summary").addEventListener("click",async e=>{await navigator.clipboard.writeText(summary.textContent);e.currentTarget.textContent="已复制 ✓"});
-document.querySelector("#print-summary").addEventListener("click",()=>window.print());
+// 使用独立打印窗口，避开 Safari 对 <dialog> 元素打印为空白的兼容问题。
+document.querySelector("#print-summary").addEventListener("click",()=>{
+  const printWindow=window.open("","_blank","width=820,height=900");
+  if(!printWindow){
+    alert("Safari 阻止了打印窗口，请允许此网站弹出窗口后重试。");
+    return;
+  }
+
+  // 页面结构固定，预约内容稍后通过 textContent 写入，避免把用户输入当作 HTML。
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>课程预约信息</title>
+  <style>
+    @page{size:A4;margin:18mm}
+    *{box-sizing:border-box}
+    body{margin:0;color:#21172f;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif}
+    main{max-width:720px;margin:0 auto;border:1px solid #ded4ed;border-radius:22px;padding:38px}
+    .mark{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#6e43c7;color:#fff;font:italic 700 24px Georgia,serif}
+    .label{margin-top:28px;color:#6e43c7;font-size:11px;font-weight:800;letter-spacing:.15em}
+    h1{margin:8px 0 22px;font-size:30px}
+    pre{margin:0;padding:22px;border-radius:16px;background:#f4effc;white-space:pre-wrap;font:15px/1.8 -apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif}
+    footer{margin-top:24px;color:#71677f;font-size:11px;text-align:center}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mark">Z</div>
+    <div class="label">BOOKING SUMMARY</div>
+    <h1>课程预约信息</h1>
+    <pre id="print-content"></pre>
+    <footer>高分辅导 · 认真讲题，也认真夸你。</footer>
+  </main>
+</body>
+</html>`);
+  printWindow.document.close();
+  printWindow.document.querySelector("#print-content").textContent=summary.textContent;
+
+  // 给 Safari 一点渲染时间，再打开系统打印/另存为 PDF 面板。
+  window.setTimeout(()=>{
+    printWindow.focus();
+    printWindow.print();
+  },250);
+});
 dialog.addEventListener("click",e=>{if(e.target===dialog)dialog.close()});manager.addEventListener("click",e=>{if(e.target===manager)manager.close()});
 renderCalendar();
